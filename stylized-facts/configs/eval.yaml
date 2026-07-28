@@ -1,0 +1,82 @@
+mode: eval
+seed: 42
+environment:
+  ref_price: 1000
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 240.0
+agents:
+- id: noise_fast
+  type: PoissonNoiseTrader
+  train: false
+  eval: false
+  decision_dt: 1.0
+  params:
+    lambda_plus: 1.0
+    lambda_minus: 1.0
+    qty: 1
+    dt: 1.0
+- id: noise_slow
+  type: PoissonNoiseTrader
+  train: false
+  eval: false
+  decision_dt: 1.0
+  params:
+    lambda_plus: 0.5
+    lambda_minus: 0.5
+    qty: 1
+    dt: 1.0
+- id: uniform_mm
+  type: UniformMarketMakers
+  train: false
+  eval: false
+  decision_dt: 1.0
+  params:
+    n_makers: 5
+    min_depth: 1
+    max_depth: 5
+    qty: 1
+    ref_price: 1000.0
+    tag_start: 30000
+    tick: 1.0
+- id: ppo_hjb_mm_0
+  type: PPOHjbMarketMaker
+  train: false
+  eval: true
+  decision_dt: 1.0
+  params:
+    lot_size: 1
+    ref_price: 1000.0
+    tick: 1.0
+    dt: 1.0
+    sim_duration: 240.0
+    N: 240
+    alpha: 0.01
+    phi: 0.001
+    lambda_plus: 1.0
+    lambda_minus: 1.0
+    kappa_min: 0.01
+    kappa_max: 2.0
+    kappa_ref: 0.8
+    q_min: -20
+    q_max: 20
+    hjb_dt: 0.5
+    lambda_ema_decay: 0.3
+    hjb_update_freq: 0
+    n_lob_levels: 5
+    n_steps: 240
+    lr: 0.0003
+    gamma: 0.99
+    gae_lambda: 1.0
+    clip_epsilon: 0.2
+    entropy_coef: 0.02
+    n_epochs: 10
+    batch_size: 64
+    tag_start: 60000
+    mode: eval
+    total_timesteps: 0
+    eval_freq: 0
+    eval_episodes: 30
+    checkpoint_freq: 0
+  checkpoint: /home/samip/Documents/marl-experiments/price_discovery/checkpoints_local/local_synth_1mm/ppo_0/ppo_hjb_mm_0_step_30029_final.pt
