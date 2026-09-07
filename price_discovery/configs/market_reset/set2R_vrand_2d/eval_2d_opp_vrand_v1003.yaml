@@ -1,0 +1,221 @@
+mode: eval
+seed: 42
+
+environment:
+  ref_price: 1000
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 80.0
+
+agents:
+  - id: noise
+    type: PoissonNoiseTrader
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      qty: 1
+      dt: 1.0
+
+  - id: hjb_mm_0
+    type: HjbMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      kappa_plus: 0.8
+      kappa_minus: 0.8
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      alpha: 0.01
+      phi: 0.001
+      q_min: -20
+      q_max: 20
+      lot_size: 1
+      N: 80
+      sim_duration: 80.0
+      hjb_dt: 1.0
+      episode_steps: 80
+      tag_start: 50000
+
+  - id: hjb_mm_1
+    type: HjbMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      kappa_plus: 0.8
+      kappa_minus: 0.8
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      alpha: 0.01
+      phi: 0.001
+      q_min: -20
+      q_max: 20
+      lot_size: 1
+      N: 80
+      sim_duration: 80.0
+      hjb_dt: 1.0
+      episode_steps: 80
+      tag_start: 50100
+
+  - id: hjb_mm_2
+    type: HjbMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      kappa_plus: 0.8
+      kappa_minus: 0.8
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      alpha: 0.01
+      phi: 0.001
+      q_min: -20
+      q_max: 20
+      lot_size: 1
+      N: 80
+      sim_duration: 80.0
+      hjb_dt: 1.0
+      episode_steps: 80
+      tag_start: 50200
+
+  - id: ppo_hjb_mm_0
+    type: PPOHjbMarketMaker
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: /home/samip/checkpoints/2d_opp_vrand/ppo_0/ppo_hjb_mm_0_step_40029_final.pt
+    params:
+      lot_size: 1
+      ref_price: 1000.0
+      tick: 1.0
+      dt: 1.0
+      sim_duration: 80.0
+      N: 80
+      alpha: 0.01
+      phi: 0.001
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      kappa_min: 0.01
+      kappa_max: 2.0
+      kappa_ref: 0.8
+      q_min: -20
+      q_max: 20
+      hjb_dt: 1.0
+      lambda_ema_decay: 0.3
+      n_lob_levels: 5
+      tag_start: 60000
+      n_steps: 80
+      mode: eval
+      total_timesteps: 0
+      eval_freq: 0
+      checkpoint_freq: 0
+
+  - id: ppo_hjb_mm_1
+    type: PPOHjbMarketMaker
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: /home/samip/checkpoints/2d_opp_vrand/ppo_1/ppo_hjb_mm_1_step_40029_final.pt
+    params:
+      lot_size: 1
+      ref_price: 1000.0
+      tick: 1.0
+      dt: 1.0
+      sim_duration: 80.0
+      N: 80
+      alpha: 0.01
+      phi: 0.001
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      kappa_min: 0.01
+      kappa_max: 2.0
+      kappa_ref: 0.8
+      q_min: -20
+      q_max: 20
+      hjb_dt: 1.0
+      lambda_ema_decay: 0.3
+      n_lob_levels: 5
+      tag_start: 60100
+      n_steps: 80
+      mode: eval
+      total_timesteps: 0
+      eval_freq: 0
+      checkpoint_freq: 0
+
+  - id: ppo_hjb_mm_2
+    type: PPOHjbMarketMaker
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: /home/samip/checkpoints/2d_opp_vrand/ppo_2/ppo_hjb_mm_2_step_40029_final.pt
+    params:
+      lot_size: 1
+      ref_price: 1000.0
+      tick: 1.0
+      dt: 1.0
+      sim_duration: 80.0
+      N: 80
+      alpha: 0.01
+      phi: 0.001
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      kappa_min: 0.01
+      kappa_max: 2.0
+      kappa_ref: 0.8
+      q_min: -20
+      q_max: 20
+      hjb_dt: 1.0
+      lambda_ema_decay: 0.3
+      n_lob_levels: 5
+      tag_start: 60200
+      n_steps: 80
+      mode: eval
+      total_timesteps: 0
+      eval_freq: 0
+      checkpoint_freq: 0
+
+  - id: informed
+    type: KyleInformedTrader
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: /home/samip/checkpoints/2d_opp_vrand/informed_step_40029_final.pt
+    params:
+      policy: linear
+      max_order: 500
+      sim_duration: 40000.0
+      n_steps: 80
+      mode: eval
+      total_timesteps: 0
+      eval_freq: 0
+      buy_only: true
+      checkpoint_freq: 0
+      fair_value: 1003
+
+  - id: liquidity
+    type: KyleLiquidityTrader
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: /home/samip/checkpoints/2d_opp_vrand/lt/liquidity_step_40029_final.pt
+    params:
+      q_target: 20
+      sell_only: true
+      phi: 0.01
+      beta_penalty: 10.0
+      n_lob_levels: 5
+      ref_price: 1000.0
+      tick: 1.0
+      lot_size: 1
+      dt: 1.0
+      sim_duration: 40000.0
+      n_steps: 80
+      mode: eval
+      total_timesteps: 0
+      eval_freq: 0
+      checkpoint_freq: 0

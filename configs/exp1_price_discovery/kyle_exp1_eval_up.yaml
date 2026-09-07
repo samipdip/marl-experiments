@@ -1,0 +1,204 @@
+mode: eval
+seed: 42
+
+environment:
+  ref_price: 1300
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 20.0
+  generator:
+    type: ema_ou
+    spread_ticks: 4
+    levels: 5
+    inner_levels: 0
+    base_qty: 20
+    qty_decay: 0.8
+    level_spacing: 1
+    inner_drift_threshold: 0
+    requote_secs: 1.0
+    rand_price_pct: 0.0
+    rand_qty_pct: 0.0
+    ema_alpha: 1.0
+    ema_sigma: 0.0
+    flow_kappa: 0.0
+    flow_sigma: 0.0
+    flow_eta: 0.0
+    impact_coeff: 0.0
+    ema_halflife: 100.0
+    mo_intensity: 0.0
+    mo_size: 0
+    mo_threshold: 0.0
+
+agents:
+  - id: mm_coordinator
+    type: KyleMMCoordinator
+    train: false
+    eval: false
+    decision_dt: 1.0
+  - id: mm_0
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_0_step_60000.pt
+    params: &mm_params
+      policy: linear
+      max_depth: 500
+      sim_duration: 20.0
+      n_steps: 20
+  - id: mm_1
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_1_step_60000.pt
+    params: *mm_params
+  - id: mm_2
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_2_step_60000.pt
+    params: *mm_params
+  - id: mm_3
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_3_step_60000.pt
+    params: *mm_params
+  - id: mm_4
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_4_step_60000.pt
+    params: *mm_params
+  - id: mm_5
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_5_step_60000.pt
+    params: *mm_params
+  - id: mm_6
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_6_step_60000.pt
+    params: *mm_params
+  - id: mm_7
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_7_step_60000.pt
+    params: *mm_params
+  - id: mm_8
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_8_step_60000.pt
+    params: *mm_params
+  - id: mm_9
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_9_step_60000.pt
+    params: *mm_params
+  - id: mm_10
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_10_step_60000.pt
+    params: *mm_params
+  - id: mm_11
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_11_step_60000.pt
+    params: *mm_params
+  - id: mm_12
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_12_step_60000.pt
+    params: *mm_params
+  - id: mm_13
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_13_step_60000.pt
+    params: *mm_params
+  - id: mm_14
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_14_step_60000.pt
+    params: *mm_params
+  - id: mm_15
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_15_step_60000.pt
+    params: *mm_params
+  - id: mm_16
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_16_step_60000.pt
+    params: *mm_params
+  - id: mm_17
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_17_step_60000.pt
+    params: *mm_params
+  - id: mm_18
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_18_step_60000.pt
+    params: *mm_params
+  - id: mm_19
+    type: KyleMarketMaker
+    train: false
+    eval: false
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/mm_19_step_60000.pt
+    params: *mm_params
+
+  - id: noise
+    type: KyleNoiseTrader
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      sigma_u: 50.0
+
+  - id: informed
+    type: KyleInformedTrader
+    train: false
+    eval: true
+    decision_dt: 1.0
+    checkpoint: results/exp1_mm_update/checkpoints/informed_step_60000.pt
+    params:
+      policy: linear
+      mu_v: 1000.0
+      sigma_v: 100.0
+      max_order: 500
+      sim_duration: 20.0
+      n_steps: 20

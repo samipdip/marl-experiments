@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Local (sandbox) vs Arena — ckpt125k statistical comparison</title>
+<style>
+  body { font-family: sans-serif; margin: 2rem; color: #222; }
+  h1 { border-bottom: 2px solid #444; padding-bottom: .3rem; }
+  h2 { margin-top: 2rem; }
+  table { border-collapse: collapse; margin: .5rem 0 1.2rem; font-size: .9rem; }
+  th, td { border: 1px solid #ccc; padding: .3rem .7rem; text-align: center; }
+  th { background: #eee; }
+  td.l { text-align: left; }
+  .ok { background: #e0ffe0; }
+  .warn { background: #ffe0e0; }
+  .note { background: #fff8dc; border-left: 4px solid #e6c300; padding: .6rem 1rem; }
+  .pair { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .pair > div { flex: 1 1 45%; min-width: 320px; }
+  .pair img { width: 100%; border: 1px solid #ccc; }
+  .cap { font-size: .85rem; color: #555; margin-top: .3rem; }
+</style>
+</head>
+<body>
+<h1>ckpt125k — sandbox vs arena: statistical validation</h1>
+
+<p class="note"><b>How to read this:</b> sandbox = 30 independent episodes (a distribution);
+arena = 1 session per scenario (a single draw). Comparing a single draw to the mean line
+is invalid; the draw must be compared to the distribution (z-score / percentile / envelope).</p>
+
+<h2>1. End-of-session mid vs sandbox distribution</h2>
+<table>
+<tr><th class="l">scenario</th><th>sandbox mean ± std</th><th>sandbox [p5, p95]</th><th>arena run2 end</th><th>z</th><th>percentile</th><th>verdict</th></tr>
+<tr><td class="l">calm (F=1000)</td><td>999.40 ± 3.62</td><td>[996.0, 1002.5]</td><td>982.5</td><td>−4.66</td><td>3%</td><td class="warn">tail draw (sandbox min = 982.5)</td></tr>
+<tr><td class="l">bull (F=1003)</td><td>1003.47 ± 3.98</td><td>[1000.0, 1013.5]</td><td>1002.2</td><td>−0.37</td><td>47%</td><td class="ok">consistent</td></tr>
+<tr><td class="l">bear (F=997)</td><td>996.57 ± 2.16</td><td>[994.0, 1000.0]</td><td>996.0</td><td>−0.26</td><td>53%</td><td class="ok">consistent</td></tr>
+</table>
+<p>Arena run1 (previous chain): calm 1000.07 (z=+0.19), bull 1002.17, bear 997.65 — all central.
+Two calm arena draws (1000.07, 982.5) straddle the sandbox distribution.</p>
+<p>Per-tick envelope coverage (fraction of arena mid ticks inside the sandbox per-tick p5–p95 band):
+calm 50%, bull 91%, bear 88%.</p>
+
+<h2>2. Volatility decomposition (why arena looks noisier)</h2>
+<table>
+<tr><th class="l">mid_std / ret_std</th><th>calm</th><th>bull</th><th>bear</th></tr>
+<tr><td class="l">sandbox 30-ep mean line (local plots)</td><td>0.46 / 0.19</td><td>0.95 / 0.24</td><td>0.97 / 0.21</td></tr>
+<tr><td class="l">sandbox single episode</td><td>1.98 / 0.71</td><td>2.08 / 0.74</td><td>2.57 / 0.91</td></tr>
+<tr><td class="l">arena session</td><td>9.8 / 3.36</td><td>4.35 / 1.25</td><td>10.3 / 2.76</td></tr>
+</table>
+<table>
+<tr><th class="l"></th><th>arena</th><th>sandbox</th></tr>
+<tr><td class="l">median |Δmid| per tick</td><td>0.0</td><td>0.0</td></tr>
+<tr><td class="l">ticks with jump ≥ 5</td><td>3.75% (calm)</td><td>0.26%</td></tr>
+<tr><td class="l">empty one-sided book</td><td>8/240 cycles (calm)</td><td>0/7200 (never)</td></tr>
+</table>
+<p class="note">Baseline tick noise is identical; the arena's excess volatility is rare
+<b>glitch jumps</b>: async cancel+repost on jittered 1s clocks leaves the book momentarily
+one-sided (ask=0), the observed mid collapses, and the MMs' observed-mid anchoring re-quotes
+around the glitched mid. Verified in the calm c160–166 logs (1000.5 → 966 → 969 in 6 cycles,
+no sell flow). The sandbox executes synchronously per tick, so this never happens there.</p>
+
+<h2>3. Side-by-side plots</h2>
+<p>Left = LOCAL (sandbox 30-ep mean), right = ARENA (live, run2). Remember: left is an average
+of 30 episodes, right is one realization — compare against the distribution above, not visually.</p>
+<h3>calm</h3><img src="calm_local_vs_arena.png" style="width:100%">
+<h3>bull</h3><img src="bull_local_vs_arena.png" style="width:100%">
+<h3>bear</h3><img src="bear_local_vs_arena.png" style="width:100%">
+<h3>neutral (arena only; now exactly 3 concurrent BTs)</h3>
+<img src="../plots_m125k_live/neutral/analysis.png" style="width:50%">
+
+<p style="margin-top:2rem;color:#777">Generated 2026-08-24. Numbers from results_matched_7x3_g99_ckpt125000_*
+(30 eps/scenario) and runs/m125k_*_live (arena 47–50).</p>
+</body>
+</html>

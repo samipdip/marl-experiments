@@ -1,0 +1,255 @@
+# Live-arena scenarios: g99 checkpoints, inference-only.
+# F is the latent fundamental; trader beliefs are v_i = F + b_i.
+# bias_mode:
+#   random (legacy) - b_i ~ U{bias_min..bias_max} drawn per trader (draw luck
+#                     can leave net bias != 0; confounded old bull/bear runs)
+#   paired          - consecutive trader slots form +/- pairs: m ~ U{1..bias_max},
+#                     signs (+,-) in random order -> cross-sectional mean(v_i) = F
+#                     exactly. Used for validation runs and net-zero generation.
+
+defaults:
+  ckpt_root: /home/samip/checkpoints/beliefs_pop_240_g99
+  # Server caps pre-allocated trader slots at 10 per arena -> 6 MM + 4 traders.
+  # (Sandbox set4 was 15 MM + 6 traders; owner account cannot join its own
+  # arena for extra identities, and registration needs email verification.)
+  n_mms: 6
+  n_traders: 4
+  rounds: 240
+  cycle_secs: 1.0
+  jitter_secs: 0.5
+  seed: 42
+  bias_min: -3
+  bias_max: 3
+  bias_mode: random
+  # Cycle-0 cold start: feed every MM a ref-centered synthetic book for its
+  # first decision so the session anchors at ref_price (~1000), not at the
+  # first poster's asymmetric cold quotes (legacy sessions started at ~996).
+  ref_anchor_warmup: true
+  # Stage-1 setting: sandbox-set4-trained g99 ckpts, full noise flow.
+  noise_lambda: 1.0
+  mm_lambda: 1.0
+  ref_price: 1000.0
+  raw_per_price: 10000
+  tick_size: 100
+  lot_size: 100
+  qty_per_unit: 100
+  q_max: 20
+  arrival_lo: 0
+  arrival_hi: 60
+  market_aggression: 5
+  # Cash parity: 1 unit = 100 shares x 1e7 raw/share = 1e9 raw at price 1000.
+  # Sandbox initial_cash = 20000 display = 2e10 raw; q_max = 20 needs at most
+  # ~2.01e10 raw. The old 1e10 (10 units of buying power) strangled every
+  # buyer at inventory +10 (bull/bear bug, silent via discarded acks).
+  # 5e10 never binds before q_max.
+  arena:
+    generator_cash: 100000000000
+    generator_inventory: 1000000
+    trader_cash: 50000000000
+    trader_inventory: 2000
+    joiner_cash: 50000000000
+    joiner_inventory: 2000
+    joiner_num_traders: 1
+    max_participants: 40
+    max_order_qty: 50000
+    circuit_breaker_bps: 2000
+    maker_fee_bps: 0
+    taker_fee_bps: 0
+    exchange_fee_bps: 0
+    lifetime_minutes: 60
+
+# Stage-2: ratio-matched deployment of the set5-retrained population
+# (7 MM + 3 BT, noise lambda 0.47 -> noise:depth 1.01x, informed:depth 1.07x,
+# noise:informed 0.94x of sandbox set4). MM HJB lambda prior mirrors training.
+profiles:
+  matched:
+    ckpt_root: /home/samip/checkpoints/matched_7x3_g99
+    n_mms: 7
+    n_traders: 3
+    noise_lambda: 0.47
+    mm_lambda: 0.47
+  # Rollback population: same matched training run but PRE-attractor ckpts
+  # (step 125000; the down-drift attractor formed after ~step 126k, see
+  # HANDOFF 5e). Symlink tree under matched_7x3_g99_125k/ -> real ckpts.
+  matched125k:
+    ckpt_root: /home/samip/checkpoints/matched_7x3_g99_125k
+    n_mms: 7
+    n_traders: 3
+    noise_lambda: 0.47
+    mm_lambda: 0.47
+  # MarlV2 stop-the-clock retrain: matched ckpt125k warm start, fine-tuned
+  # 15k steps in MarlV2Env (s42), pre-attractor selection (HANDOFF 5h).
+  # Symlink tree marlv2_ft15000/ -> marlv2_ft125k_s42 *_step_15000.pt.
+  marlv2ft:
+    ckpt_root: /home/samip/checkpoints/marlv2_ft15000
+    n_mms: 7
+    n_traders: 3
+    noise_lambda: 0.47
+    mm_lambda: 0.47
+
+scenarios:
+  calm:
+    f: 1000
+    bias_mode: paired
+  bull:
+    f: 1003
+    bias_mode: paired
+  bear:
+    f: 997
+    bias_mode: paired
+  # Neutral = synthetic-market generation: F flat, net-zero paired biases,
+  # participant churn (rotating +/- spawn pairs keep informed flow alive but
+  # mean-zero). Success: no drift (mid mean-reverts to ref), stationary
+  # spread/depth. Distinct from calm-paired (fixed traders, flow decays once
+  # beliefs are priced in).
+  neutral:
+    f: 1000
+    bias_mode: paired
+    churn:
+      enabled: true
+      slots: 4
+      n_parallel: 4
+      start_after: 30
+      life_mean: 60
+      life_min: 20
+      life_max: 150
+      respawn_gap: 8
+  # No aggregate news: F stays at 1000 and the only informed signal is each
+  # trader's own bias b_i ~ U{-3..3}. Belief traders CHURN: random lifetimes,
+  # exits and respawns with fresh biases (participants leaving/entering).
+  # Legacy random-draw variant of neutral; kept for comparability.
+  biased:
+    f: 1000
+    churn:
+      enabled: true
+      slots: 4            # pre-allocated trader slots reused across spawns
+      n_parallel: 4       # concurrent belief traders maintained
+      start_after: 30     # cycles before the first spawn wave
+      life_mean: 60       # exponential mean lifetime (cycles)
+      life_min: 20
+      life_max: 150
+      respawn_gap: 8      # cycles a freed slot rests before reuse
+  # ── Stage-2 matched scenarios (set5 ckpts, 7 MM + 3 BT, λ=0.47) ──────
+  matched_calm:
+    profile: matched
+    f: 1000
+    bias_mode: paired
+  matched_bull:
+    profile: matched
+    f: 1003
+    bias_mode: paired
+  matched_bear:
+    profile: matched
+    f: 997
+    bias_mode: paired
+  # Net-zero synthetic generation with the matched roster: paired biases AND
+  # couple_pairs (pairs spawn at the same cycle with identical lifetimes and
+  # exit together) -> alive-set composition stays net-zero at all times.
+  matched_neutral:
+    profile: matched
+    f: 1000
+    bias_mode: paired
+    churn:
+      enabled: true
+      slots: 3
+      n_parallel: 3
+      start_after: 30
+      life_mean: 60
+      life_min: 20
+      life_max: 150
+      respawn_gap: 8
+      couple_pairs: false
+  # ── Rollback (pre-attractor ckpt 125k) live validation ─────────────
+  # ── Transfer-validation scenarios (2026-08-24) ─────────────────────
+  # Same population/settings as m125k_* but bias_mode: random so belief
+  # biases are drawn iid U{-3..3} per trader — matching the sandbox eval
+  # (BeliefCoordinator._init_episode). Combine with orchestrator --seed N
+  # so each session is an independent draw (fresh biases/arrivals/noise)
+  # comparable against the 100-episode sandbox reference distribution.
+  val_calm:
+    profile: matched125k
+    f: 1000
+    bias_mode: random
+  val_bull:
+    profile: matched125k
+    f: 1003
+    bias_mode: random
+  val_bear:
+    profile: matched125k
+    f: 997
+    bias_mode: random
+  # ── Transfer-validation runs (30v30, 2026-08-24) ────────────────────
+  # val2_*: same as val_* but cycle_secs halved (timing verified: joiner API
+  # work never overran the 1.0s window, max gap 1.456 <= 1.5 cap in 240/240
+  # cycles; no client rate limits) and orchestrator md_log enabled for LOB
+  # depth validation. 30 sessions/scenario, --seed 101..130, 30 sandbox eps.
+  val2_calm:
+    profile: matched125k
+    f: 1000
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  val2_bull:
+    profile: matched125k
+    f: 1003
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  val2_bear:
+    profile: matched125k
+    f: 997
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  # ── val4: MarlV2 fine-tuned population (ft@15000) transfer validation
+  # (2026-08-28). Identical protocol to val2 (0.5s cycles, random biases,
+  # 30 sessions/scenario, --seed 101..130) for a paired comparison against
+  # the val2 verdict in HANDOFF 5g. In-env 30-ep reference: HANDOFF 5h.
+  val4_calm:
+    profile: marlv2ft
+    f: 1000
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  val4_bull:
+    profile: marlv2ft
+    f: 1003
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  val4_bear:
+    profile: marlv2ft
+    f: 997
+    bias_mode: random
+    cycle_secs: 0.5
+    jitter_secs: 0.25
+  m125k_calm:
+    profile: matched125k
+    f: 1000
+    bias_mode: paired
+  m125k_bull:
+    profile: matched125k
+    f: 1003
+    bias_mode: paired
+  m125k_bear:
+    profile: matched125k
+    f: 997
+    bias_mode: paired
+  m125k_neutral:
+    profile: matched125k
+    f: 1000
+    bias_mode: paired
+    churn:
+      enabled: true
+      slots: 3
+      n_parallel: 3
+      start_after: 30
+      life_mean: 60
+      life_min: 20
+      life_max: 150
+      respawn_gap: 8
+      # couple_pairs disabled: with 3 concurrent traders an even ± pair
+      # rotation can never fill 3 slots. Biases still come from the paired
+      # queue (net-zero in expectation over spawns). Keeps the on-arena
+      # roster at exactly 7 MM + 3 BT = the trained composition.
+      couple_pairs: false

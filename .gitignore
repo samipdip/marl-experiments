@@ -1,0 +1,45 @@
+# Results (reproducible from configs + code)
+results/
+!results/.gitkeep
+
+# Checkpoints
+*.pt
+*.pth
+**/checkpoints/
+
+# Data artifacts
+*.csv
+*.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# uv
+uv.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/tmp/

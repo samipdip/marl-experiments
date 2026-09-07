@@ -1,0 +1,9 @@
+# FastBoxEx client configuration for the live arena experiments.
+# Credentials belong in .env (FASTBOXEX_USER / FASTBOXEX_PASS), never here.
+# Endpoints are derived from the active profile host.
+
+[connection]
+
+[[connection.profiles]]
+name = "On-campus"
+host = "172.16.22.83"

@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{MARL Environment}{2}{0}{1}
+\beamer@sectionintoc {2}{Motivation \& Background}{6}{0}{2}
+\beamer@sectionintoc {3}{Experiment Configurations}{10}{0}{3}
+\beamer@sectionintoc {4}{Results -- LOB Price Convergence}{11}{0}{4}
+\beamer@sectionintoc {5}{Cross-Experiment Comparison}{17}{0}{5}
+\beamer@sectionintoc {6}{Conclusion}{20}{0}{6}
+\beamer@sectionintoc {7}{Annex -- Full Plots}{21}{1}{7}

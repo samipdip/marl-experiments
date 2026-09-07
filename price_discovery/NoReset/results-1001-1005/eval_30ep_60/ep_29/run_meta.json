@@ -1,0 +1,7 @@
+{
+  "config_path": "price_discovery/price_discovery_eval.yaml",
+  "device": "cpu",
+  "seed": 10029,
+  "duration": null,
+  "n_ticks": null
+}

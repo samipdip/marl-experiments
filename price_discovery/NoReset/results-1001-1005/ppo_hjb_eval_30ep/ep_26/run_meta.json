@@ -1,0 +1,7 @@
+{
+  "config_path": "price_discovery/ppo_hjb_eval.yaml",
+  "device": "cpu",
+  "seed": 10026,
+  "duration": null,
+  "n_ticks": null
+}

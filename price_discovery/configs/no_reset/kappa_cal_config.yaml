@@ -1,0 +1,33 @@
+seed: 123
+
+environment:
+  ref_price: 1000
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 20000.0
+
+train:
+  total_timesteps: 2000
+
+agents:
+  - id: uniform_mm
+    type: UniformMarketMakers
+    decision_dt: 1.0
+    params:
+      n_makers: 5
+      min_depth: 1
+      max_depth: 5
+      qty: 1
+      ref_price: 1000.0
+      tick: 1.0
+      tag_start: 40000
+
+  - id: noise
+    type: PoissonNoiseTrader
+    decision_dt: 1.0
+    params:
+      lambda_plus: 1.0
+      lambda_minus: 1.0
+      qty: 1
+      dt: 1.0

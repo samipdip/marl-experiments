@@ -1,0 +1,7 @@
+{
+  "config_path": "/tmp/ppo_hjb_eval_v1002.yaml",
+  "device": "cpu",
+  "seed": 10099,
+  "duration": null,
+  "n_ticks": null
+}

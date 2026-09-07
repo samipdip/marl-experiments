@@ -1,0 +1,53 @@
+mode: eval
+seed: 42
+
+environment:
+  ref_price: 700
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 119.0
+
+agents:
+  - id: mm_0
+    type: HjbMarketMaker
+    train: false
+    eval: false
+    decision_dt: 2.0
+    decision_phase: 0
+    params:
+      lot_size: 500
+      N: 60
+      sim_duration: 120.0
+      kappa: 0.5
+      alpha: 0.1
+      phi: 0.3
+      lambda_plus: 0.7
+      lambda_minus: 0.7
+      q_min: -25
+      q_max: 25
+
+  - id: noise
+    type: KyleNoiseTrader
+    train: false
+    eval: false
+    decision_dt: 2.0
+    decision_phase: 1
+    params:
+      sigma_u: 50.0
+
+  - id: informed
+    type: KyleInformedTrader
+    train: false
+    eval: true
+    decision_dt: 2.0
+    decision_phase: 1
+    params:
+      policy: linear
+      mu_v: 1000.0
+      sigma_v: 100.0
+      max_order: 500
+      sim_duration: 120.0
+      n_steps: 120
+      start_step: 0
+      mu_is: 0.0

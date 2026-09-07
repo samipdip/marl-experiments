@@ -1,0 +1,11 @@
+-reward structure of MM have to have 0 accross all MM agents
+-observation at t: t-1????
+
+
+
+
+
+ pro rata = market orders arrive, then auction for MMs
+ FIFO = MMs quote + market orders simulatneous
+ so in our case, the IT has to adapt to the MMs not the other way around. so the current reward structure encourages high volume trading early on instead of optimising the execution cost.
+

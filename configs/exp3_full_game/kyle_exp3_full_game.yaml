@@ -1,0 +1,247 @@
+mode: train
+seed: 42
+
+environment:
+  ref_price: 1000
+  tick_size: 1
+  lot_size: 1
+  env_dt: 1.0
+  sim_duration: 20.0
+  generator:
+    type: ema_ou
+    spread_ticks: 2
+    levels: 1
+    inner_levels: 0
+    base_qty: 1
+    qty_decay: 0.0
+    level_spacing: 1
+    inner_drift_threshold: 0
+    requote_secs: 1.0
+    rand_price_pct: 0.0
+    rand_qty_pct: 0.0
+    ema_alpha: 1.0
+    ema_sigma: 0.0
+    flow_kappa: 0.0
+    flow_sigma: 0.0
+    flow_eta: 0.0
+    impact_coeff: 0.0
+    ema_halflife: 100.0
+    mo_intensity: 0.0
+    mo_size: 0
+    mo_threshold: 0.0
+
+agents:
+  - id: mm_coordinator
+    type: KyleMMCoordinator
+    train: false
+    eval: false
+    decision_dt: 1.0
+  # 20 Market Makers
+  - id: mm_0
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: &mm_params
+      policy: linear
+      max_spread_ticks: 50
+      max_size: 10
+      inventory_penalty: 0.0
+      sim_duration: 20.0
+      n_steps: 20
+      lr: 0.0003
+      gamma: 1.0
+      gae_lambda: 1.0
+      clip_epsilon: 0.2
+      entropy_coef: 0.01
+      n_epochs: 10
+      batch_size: 64
+
+  - id: mm_1
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_2
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_3
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_4
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_5
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_6
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_7
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_8
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_9
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_10
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_11
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_12
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_13
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_14
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_15
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_16
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_17
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_18
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  - id: mm_19
+    type: KyleMarketMaker
+    train: true
+    eval: false
+    decision_dt: 1.0
+    params: *mm_params
+
+  # Noise trader
+  - id: noise
+    type: KyleNoiseTrader
+    train: false
+    eval: false
+    decision_dt: 1.0
+    params:
+      sigma_u: 50.0
+
+  # Informed trader
+  - id: informed
+    type: KyleInformedTrader
+    train: true
+    eval: true
+    decision_dt: 1.0
+    params:
+      policy: linear
+      mu_v: 1000.0
+      sigma_v: 100.0
+      max_order: 500
+      sim_duration: 20.0
+      n_steps: 20
+      lr: 0.0003
+      gamma: 1.0
+      gae_lambda: 1.0
+      clip_epsilon: 0.2
+      entropy_coef: 0.01
+      n_epochs: 10
+      batch_size: 64
+
+  # Liquidity trader
+  - id: lt
+    type: KyleLiquidityTrader
+    train: true
+    eval: true
+    decision_dt: 1.0
+    params:
+      q_target: 1000
+      phi: 0.01
+      beta_penalty: 10.0
+      sim_duration: 20.0
+      n_steps: 20
+      lr: 0.0003
+      gamma: 1.0
+      gae_lambda: 1.0
+      clip_epsilon: 0.2
+      entropy_coef: 0.01
+      n_epochs: 10
+      batch_size: 64
+
+train:
+  total_timesteps: 20000
+  eval_freq: 5000
+  eval_episodes: 30
+  checkpoint_freq: 5000

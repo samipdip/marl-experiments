@@ -1,0 +1,54 @@
+mode: eval
+environment:
+  sim_duration: 5.0
+agents:
+- id: belief_coordinator
+  type: BeliefCoordinator
+  params:
+    f_min: 1000
+    f_max: 1000
+    bias_min: -3
+    bias_max: 3
+    name: belief_coordinator
+- id: noise
+  type: PoissonNoiseTrader
+  params:
+    lambda_plus: 0.47
+    lambda_minus: 0.47
+    qty: 1
+    dt: 1.0
+- id: ppo_hjb_mm_0
+  type: PPOHjbMarketMaker
+  params:
+    lot_size: 1
+    ref_price: 1000.0
+    tick: 1.0
+    dt: 1.0
+    sim_duration: 240.0
+    N: 240
+    alpha: 0.01
+    phi: 0.001
+    lambda_plus: 0.47
+    lambda_minus: 0.47
+    kappa_min: 0.01
+    kappa_max: 2.0
+    kappa_ref: 0.8
+    q_min: -20
+    q_max: 20
+    hjb_dt: 0.5
+    lambda_ema_decay: 0.3
+    hjb_update_freq: 0
+    n_lob_levels: 5
+    n_steps: 240
+    tag_start: 60000
+- id: belief_0
+  type: BeliefTrader
+  params:
+    policy: linear
+    max_order: 500
+    initial_cash: 20000.0
+    q_max: 20
+    arrival_lo: 0
+    arrival_hi: 60
+    n_steps: 240
+    sim_duration: 60000.0
