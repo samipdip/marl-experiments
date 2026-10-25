@@ -1,21 +1,8 @@
-# ABIDES-MARL Experiments
-
-Recreation of three experiments from Cheridiko, Dupret & Wu (arXiv:2511.02016) using the SimExchangeSandbox CDA matching engine.
-
-## Structure
-
-```
-abides-marl-experiments/
-  configs/           Experiment YAML configs (one per sweep config)
-  experiments/       Orchestration scripts (train -> eval -> analyze -> plot)
-  analysis/          Plotting + table generation
-  results/           Output (gitignored): checkpoints, CSVs, figures, tables
-```
-
+MARL Gymnasium
 ## Libraries (installed as path dependencies)
 
 - `SimExchangeSandbox` — CDA matching engine, SimEnv, factory, runner
-- `Trading_agents` — Agent base classes + Kyle RL agents (ABIDES_MARL/)
+- `Trading_agents` — Agent base classes + RL agents
 
 ## Setup
 
